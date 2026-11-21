@@ -272,7 +272,7 @@ function settings(){return `<div class="top"><button class="btn s" style="paddin
   <h2>数据管理</h2><div class="menu">
   <div onclick="exportCSV()"><span>📤 导出 CSV（复制到剪贴板）</span>›</div>
   <div onclick="askConfirm('确定清空所有记录？此操作无法撤销。',()=>{S.recs=[];save();render();toast('所有记录已清空')})"><span style="color:#E5484D">🗑️ 清空所有记录</span>›</div></div>
-  <p class="footnote">v1.1.2 · 数据只保存在本机，换设备不会自动同步。更新前建议先导出备份。</p>`}
+  <p class="footnote">v1.1.5 · 数据只保存在本机，换设备不会自动同步。更新前建议先导出备份。</p>`}
 function applyTheme(){const choice=S.theme||'system',dark=choice==='dark'||(choice==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]').content=dark?'#151725':'#F5F6FB'}
 function setAvatar(a){S.avatar=a;save();render();toast('头像已更新')}
 function setAvatarFile(f){if(!f)return;if(!f.type.startsWith('image/'))return toast('请选择图片');if(f.size>10*1024*1024)return toast('图片不能超过10MB');const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=160;const ctx=c.getContext('2d');const side=Math.min(img.width,img.height);ctx.drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,160,160);S.avatar=c.toDataURL('image/jpeg',.75);save();render();toast('头像已更新')};img.onerror=()=>toast('图片无法读取');img.src=fr.result};fr.readAsDataURL(f)}
@@ -323,12 +323,61 @@ function openDetail(id){const r=S.recs.find(x=>x.id==id),c=CATS[r.cat],s=ST[r.st
 function render(){$('#main').innerHTML={home,list,stats,me,settings}[S.tab]();
  const n=[['home','🏠','首页'],['list','🧾','记录'],['add','＋',''],['stats','📊','统计'],['me','👤','我的']];
  if(!$('#nav').children.length)$('#nav').innerHTML=n.map(x=>x[0]=='add'?`<button class="fab" onclick="openAdd()" aria-label="记一笔"><span class="pl"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>`:`<button class="${S.tab==x[0]?'on':''}" onclick="go('${x[0]}')" data-t="${x[0]}"><i>${x[1]}</i>${x[2]}</button>`).join('');document.querySelectorAll('#nav button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab))}
-const VERSION='1.1.4';let updateReady=false;
+const VERSION='1.1.5';
+let updateReady=false, updateBusy=false;
+const installedVersionKey='bxj-installed-app-version';
 function showUpdate(){updateReady=true;$('#updateBar').classList.add('on')}
-async function checkUpdate(){if(!/^https?:/.test(location.protocol))return;try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)return;const j=await r.json();if(j.version&&j.version!==VERSION)showUpdate();if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update()}}catch(e){}}
-async function updateApp(){if('serviceWorker'in navigator){try{const reg=await navigator.serviceWorker.getRegistration();if(reg)await reg.update()}catch(e){}}location.reload()}
-if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(()=>checkUpdate()).catch(()=>checkUpdate()));
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate()});window.addEventListener('focus',checkUpdate);
+async function checkUpdate(){
+ if(!/^https?:/.test(location.protocol))return;
+ try{
+  const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
+  if(!r.ok)return;
+  const remote=await r.json();
+  if(remote.version&&remote.version!==VERSION){showUpdate();return}
+  if('serviceWorker'in navigator){
+   const reg=await navigator.serviceWorker.getRegistration();
+   if(reg){await reg.update();if(reg.waiting&&navigator.serviceWorker.controller)showUpdate()}
+  }
+ }catch(e){}
+}
+async function updateApp(){
+ if(updateBusy)return;
+ updateBusy=true;
+ try{
+  if('serviceWorker'in navigator){
+   const reg=await navigator.serviceWorker.getRegistration();
+   if(reg){
+    await reg.update();
+    if(reg.waiting){
+     let changed=false;
+     navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!changed){changed=true;location.reload()}},{once:true});
+     reg.waiting.postMessage({type:'SKIP_WAITING'});
+     return;
+    }
+   }
+  }
+  location.reload();
+ }catch(e){updateBusy=false;location.reload()}
+}
+try{
+ const prev=localStorage.getItem(installedVersionKey);
+ if(prev!==VERSION){
+  localStorage.setItem(installedVersionKey,VERSION);
+  if(prev&&prev!==VERSION)addEventListener('load',()=>toast('已更新到 v'+VERSION));
+ }
+}catch(e){}
+if('serviceWorker'in navigator&&/^https?:/.test(location.protocol)){
+ addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(reg=>{
+  if(reg.waiting&&navigator.serviceWorker.controller)showUpdate();
+  reg.addEventListener('updatefound',()=>{
+   const worker=reg.installing;
+   if(worker)worker.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller)showUpdate()});
+  });
+  checkUpdate();
+ }).catch(()=>checkUpdate()));
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate()});
+window.addEventListener('focus',checkUpdate);
 if(window.matchMedia){matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(S.theme==='system')applyTheme()})}
 render();anim();
 </script></body></html>
