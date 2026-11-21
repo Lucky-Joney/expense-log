@@ -1,10 +1,10 @@
-const C='bxj-v1',A=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A)).then(()=>self.skipWaiting()))});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET')return;
-  e.respondWith(caches.match(e.request,{ignoreSearch:true}).then(hit=>{
-    const net=fetch(e.request).then(r=>{
-      if(r&&r.ok&&new URL(e.request.url).origin===location.origin){const cp=r.clone();caches.open(C).then(c=>c.put(e.request,cp))}
-      return r}).catch(()=>hit);
-    return hit||net}))});
+const CACHE='bxj-v1.1.1';
+const ASSETS=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','version.json'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('bxj-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',event=>{
+ const request=event.request;
+ if(request.method!=='GET'||new URL(request.url).origin!==self.location.origin)return;
+ if(new URL(request.url).pathname.endsWith('/version.json')){event.respondWith(fetch(request,{cache:'no-store'}));return;}
+ event.respondWith(fetch(request).then(response=>{if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(request,copy)))}return response}).catch(()=>caches.match(request).then(cached=>cached||((request.mode==='navigate')?caches.match('index.html'):Response.error()))));
+});
