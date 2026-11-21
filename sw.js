@@ -1,24 +1,27 @@
-const CACHE='bxj-v1.1.6';
+const CACHE='bxj-v1.1.8';
 const ASSETS=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png'];
-self.addEventListener('install',event=>{
- event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));
+self.addEventListener('install',e=>{
+ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting()));
 });
-self.addEventListener('activate',event=>{
- event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('bxj-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
+self.addEventListener('activate',e=>{
+ e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('bxj-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
 });
-self.addEventListener('message',event=>{if(event.data&&event.data.type==='SKIP_WAITING')self.skipWaiting()});
-self.addEventListener('fetch',event=>{
- const req=event.request;
+self.addEventListener('fetch',e=>{
+ const req=e.request;
  if(req.method!=='GET'||new URL(req.url).origin!==self.location.origin)return;
  if(new URL(req.url).pathname.endsWith('/version.json')){
-  event.respondWith(fetch(req,{cache:'no-store'}));return;
+  e.respondWith(fetch(req,{cache:'no-store'}));return;
  }
- // Keep the installed app shell stable until the user approves an update.
+ // Prefer the actual published HTML, never return an obsolete cached app on a normal online launch.
  if(req.mode==='navigate'){
-  event.respondWith(caches.match('index.html').then(cached=>cached||fetch(req)));return;
+  e.respondWith(fetch(req,{cache:'no-store'}).then(r=>{
+   if(r.ok){const cp=r.clone();e.waitUntil(caches.open(CACHE).then(c=>c.put('index.html',cp)))}
+   return r;
+  }).catch(()=>caches.open(CACHE).then(c=>c.match('index.html')).then(c=>c||Response.error())));
+  return;
  }
- event.respondWith(caches.match(req).then(cached=>cached||fetch(req).then(res=>{
-  if(res.ok){const copy=res.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)))}
-  return res;
+ e.respondWith(caches.open(CACHE).then(c=>c.match(req)).then(hit=>hit||fetch(req).then(r=>{
+  if(r.ok){const cp=r.clone();e.waitUntil(caches.open(CACHE).then(c=>c.put(req,cp)))}
+  return r;
  })));
 });

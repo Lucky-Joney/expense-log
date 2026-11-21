@@ -323,42 +323,52 @@ function openDetail(id){const r=S.recs.find(x=>x.id==id),c=CATS[r.cat],s=ST[r.st
 function render(){$('#main').innerHTML={home,list,stats,me,settings}[S.tab]();
  const n=[['home','🏠','首页'],['list','🧾','记录'],['add','＋',''],['stats','📊','统计'],['me','👤','我的']];
  if(!$('#nav').children.length)$('#nav').innerHTML=n.map(x=>x[0]=='add'?`<button class="fab" onclick="openAdd()" aria-label="记一笔"><span class="pl"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>`:`<button class="${S.tab==x[0]?'on':''}" onclick="go('${x[0]}')" data-t="${x[0]}"><i>${x[1]}</i>${x[2]}</button>`).join('');document.querySelectorAll('#nav button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab))}
-const VERSION='1.1.6';
+const VERSION='1.1.8';
 let updateReady=false, updateBusy=false;
 const installedVersionKey='bxj-installed-app-version';
-function showUpdate(){updateReady=true;$('#updateBar').classList.add('on')}
+function versionParts(v){return String(v||'').split('.').map(x=>parseInt(x,10)||0)}
+function newerVersion(remote,local){const a=versionParts(remote),b=versionParts(local);for(let i=0;i<Math.max(a.length,b.length);i++){if((a[i]||0)!==(b[i]||0))return (a[i]||0)>(b[i]||0)}return false}
+function showUpdate(){if(updateBusy)return;updateReady=true;$('#updateBar').classList.add('on')}
 async function checkUpdate(){
- if(!/^https?:/.test(location.protocol))return;
+ if(!/^https?:/.test(location.protocol)||updateBusy)return;
  try{
   const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
   if(!r.ok)return;
   const remote=await r.json();
-  if(remote.version&&remote.version!==VERSION){showUpdate();return}
-  if('serviceWorker'in navigator){
-   const reg=await navigator.serviceWorker.getRegistration();
-   if(reg){await reg.update();if(reg.waiting&&navigator.serviceWorker.controller)showUpdate()}
-  }
+  if(newerVersion(remote.version,VERSION)){showUpdate();return}
+  // A stale waiting worker alone is not proof that a newer app exists.
+  updateReady=false;$('#updateBar').classList.remove('on');
+  if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg)reg.update().catch(()=>{})}
  }catch(e){}
 }
 async function updateApp(){
  if(updateBusy)return;
  updateBusy=true;
+ const btn=$('#updateBar button');if(btn){btn.disabled=true;btn.textContent='更新中…'}
  try{
+  const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
+  if(!r.ok)throw new Error('无法读取版本信息');
+  const remote=await r.json();
+  if(!newerVersion(remote.version,VERSION)){
+   updateReady=false;$('#updateBar').classList.remove('on');toast('当前已是最新版本');return;
+  }
+  // Request the newly published worker first. Its navigation strategy is network-first.
   if('serviceWorker'in navigator){
    const reg=await navigator.serviceWorker.getRegistration();
-   if(reg){
-    await reg.update();
-    if(reg.waiting){
-     let changed=false;
-     navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!changed){changed=true;location.reload()}},{once:true});
-     reg.waiting.postMessage({type:'SKIP_WAITING'});
-     return;
-    }
-   }
+   if(reg)await reg.update();
   }
-  location.reload();
- }catch(e){updateBusy=false;location.reload()}
+  // Only remove app shell caches. Never touch localStorage, IndexedDB or saved expenses.
+  if('caches'in window){
+   const keys=await caches.keys();
+   await Promise.all(keys.filter(k=>k.startsWith('bxj-')).map(k=>caches.delete(k)));
+  }
+  const url=new URL('./index.html',location.href);
+  url.searchParams.set('refresh',String(Date.now()));
+  location.replace(url.href);
+ }catch(e){toast('更新失败：'+(e?.message||'网络错误'))}
+ finally{updateBusy=false;if(btn){btn.disabled=false;btn.textContent=T('立即更新')}}
 }
+
 try{
  const prev=localStorage.getItem(installedVersionKey);
  if(prev!==VERSION){
@@ -368,11 +378,6 @@ try{
 }catch(e){}
 if('serviceWorker'in navigator&&/^https?:/.test(location.protocol)){
  addEventListener('load',()=>navigator.serviceWorker.register('sw.js').then(reg=>{
-  if(reg.waiting&&navigator.serviceWorker.controller)showUpdate();
-  reg.addEventListener('updatefound',()=>{
-   const worker=reg.installing;
-   if(worker)worker.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller)showUpdate()});
-  });
   checkUpdate();
  }).catch(()=>checkUpdate()));
 }
