@@ -154,8 +154,20 @@ input,textarea,select{user-select:text;-webkit-user-select:text;-webkit-touch-ca
 #confirmMask.on{display:flex}
 #confirmDialog{width:100%;max-width:350px;background:var(--surface,#fff);border-radius:22px;padding:24px 20px;box-shadow:0 20px 50px #0004;text-align:center;color:var(--tx)}
 #confirmDialog p{line-height:1.6;margin:12px 0 20px}
-#updateBar{display:none;position:absolute;z-index:20;bottom:80px;left:12px;right:12px;padding:12px;background:var(--surface,#fff);color:var(--tx);border:1px solid var(--ln);border-radius:16px;box-shadow:0 6px 22px #0003;align-items:center;gap:12px}
-#updateBar.on{display:flex}
+#updateDialogMask{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(18,20,40,.40);opacity:0;visibility:hidden;transition:opacity .2s ease,visibility 0s .2s}
+#updateDialogMask.on{opacity:1;visibility:visible;transition:opacity .2s ease}
+#updateDialog{width:100%;max-width:360px;background:var(--surface,#fff);color:var(--tx);border-radius:22px;padding:22px 20px;box-shadow:0 18px 50px #0003;border:1px solid var(--ln);transform:translateY(10px) scale(.98);transition:transform .25s cubic-bezier(.22,1,.36,1)}
+#updateDialogMask.on #updateDialog{transform:none}
+#updateDialog h3{margin:0 0 6px;font-size:19px}
+#updateDialog p{margin:6px 0 14px;color:var(--sub);font-size:13px;line-height:1.5}
+.versionCompare{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:14px 0 20px}
+.versionCell{background:var(--bg);border-radius:12px;padding:12px 8px;text-align:center;min-width:0}
+.versionCell small{display:block;color:var(--sub);font-size:11px;margin-bottom:5px}
+.versionCell strong{font-size:16px;word-break:break-all}
+#updateDialog .actions{display:flex;gap:10px}
+#updateDialog .actions button{flex:1}
+#updateDialogMask button:disabled{opacity:.55}
+@media(prefers-reduced-motion:reduce){#updateDialogMask,#updateDialog{transition:none!important}}
 :root{--surface:#fff}
 html[data-theme="dark"]{--p:#9C8AFF;--c:#FF9377;--t:#1BD9B8;--y:#FFBC45;--pk:#FF7EAB;--b:#6EA4FF;--bg:#151725;--tx:#F3F3FA;--sub:#ADB0C6;--ln:#35384F;--surface:#222538;color-scheme:dark}
 html[data-theme="dark"] body{background:#0E101A}
@@ -167,13 +179,44 @@ html[data-theme="dark"] .btn.d{background:#512B38;color:#FF9BA3}
 html[data-theme="dark"] .chip.on{background:var(--p);color:#111}
 html[data-theme="dark"] .toast{background:#41445A}
 @media (max-width:350px){.settingField{flex-wrap:wrap}.settingField input{width:100%!important}}
+
+/* v1.2.0: smoother, consistent motion without large stagger gaps. */
+:root{--motion-ease:cubic-bezier(.22,1,.36,1)}
+#main.enter>*{animation:page-enter .34s var(--motion-ease) both!important;animation-delay:0s!important}
+#main.enter>:nth-child(2){animation-delay:.035s!important}
+#main.enter>:nth-child(3){animation-delay:.07s!important}
+#main.enter>:nth-child(n+4){animation-delay:.09s!important}
+#main.enter #ls .it{animation:item-enter .3s var(--motion-ease) both!important;animation-delay:0s!important}
+#main.enter #ls .it:nth-child(2){animation-delay:.035s!important}
+#main.enter #ls .it:nth-child(n+3){animation-delay:.055s!important}
+#main.enter .hero .bar i,#main.enter .rk .bar i,#main.enter .stk i{animation:grow .48s var(--motion-ease) .1s both!important}
+#main.enter .col i{animation:growy .5s var(--motion-ease) .1s both!important}
+#main.enter .ring{animation:ring-enter .42s var(--motion-ease) .06s both!important}
+@keyframes page-enter{from{opacity:.25;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes item-enter{from{opacity:.2;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ring-enter{from{opacity:.6;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.mask{transition:opacity .22s ease,visibility 0s .22s}
+.mask.on{transition:opacity .22s ease}
+.sheet{transition:transform .33s var(--motion-ease)}
+.toast{transition:opacity .2s ease,transform .28s var(--motion-ease)}
+.menu>div{transition:background-color .2s ease,transform .2s var(--motion-ease)}
+.menu>div:active{background:var(--bg);transform:scale(.995)}
+.menuArrow{flex:none;color:var(--sub);font-size:20px;font-weight:400}
+@media(prefers-reduced-motion:reduce){#main.enter>*,#main.enter #ls .it,#main.enter .hero .bar i,#main.enter .rk .bar i,#main.enter .stk i,#main.enter .col i,#main.enter .ring{animation:none!important}.sheet,.mask,.toast,.menu>div{transition:none!important}}
+html.motion-off #main.enter>*,html.motion-off #main.enter #ls .it,html.motion-off #main.enter .hero .bar i,html.motion-off #main.enter .rk .bar i,html.motion-off #main.enter .stk i,html.motion-off #main.enter .col i,html.motion-off #main.enter .ring{animation:none!important}
+html.motion-off .mask,html.motion-off .sheet,html.motion-off .toast,html.motion-off .menu>div{transition:none!important}
 </style></head>
 <body><div id="app"><main id="main"></main>
 <nav id="nav"></nav>
 <div class="mask" id="mask" onclick="if(event.target===this)closeSheet()"><div class="sheet" id="sheet"></div></div>
 <div class="mask" id="lb" style="align-items:center;z-index:8" onclick="this.classList.remove('on')"><img id="lbi" alt="票据大图" style="max-width:94%;max-height:86%;margin:auto;border-radius:14px"></div>
 <div class="toast" id="toast"></div>
-<div id="updateBar"><span style="flex:1">✨ 有新版本可用</span><button class="btn" style="padding:9px" onclick="updateApp()">立即更新</button></div>
+<div id="updateDialogMask" role="dialog" aria-modal="true" aria-labelledby="updateTitle">
+<div id="updateDialog">
+<h3 id="updateTitle"></h3><p id="updateDetail"></p>
+<div class="versionCompare"><div class="versionCell"><small id="localVersionLabel"></small><strong id="localVersion"></strong></div><span aria-hidden="true">→</span><div class="versionCell"><small id="remoteVersionLabel"></small><strong id="remoteVersion"></strong></div></div>
+<div class="actions"><button id="updateCancel" class="btn s" onclick="closeUpdateDialog()"></button><button id="updateAction" class="btn" onclick="updateDialogAction()"></button></div>
+</div></div>
 <div id="confirmMask"><div id="confirmDialog"><b style="font-size:18px">请确认</b><p id="confirmText"></p><div class="row"><button class="btn s" style="flex:1" onclick="closeConfirm()">取消</button><button class="btn d" style="flex:1" onclick="closeConfirm(true)">确认</button></div></div></div></div>
 <script>
 const CATS=[['交通','🚕','#3B82F6'],['餐饮','🍜','#FF7A59'],['住宿','🏨','#6C5CE7'],['办公','📎','#14C8A8'],['通讯','📱','#FF5C8A'],['差旅','✈️','#FFB020'],['招待','🥂','#A855F7'],['其他','🧾','#8A8FA8']];
@@ -194,7 +237,7 @@ const PAIRS='与與个個义義习習仅僅传傳余餘储儲删刪办辦动動�
 const TWM={};for(let i=0;i<PAIRS.length;i+=2)TWM[PAIRS[i]]=PAIRS[i+1];
 const TP=[['复制','複製'],['导出','匯出'],['设置','設定'],['剪贴板','剪貼簿'],['网盘','雲端硬碟'],['出租车','計程車'],['网约车','叫車'],['打车','叫車'],['话费','電話費'],['打印纸','影印紙'],['项目','專案'],['添加','新增'],['保存','儲存'],['搜索','搜尋'],['链接','連結'],['软件','軟體'],['信息','資訊'],['视频','影片'],['文件','檔案'],['语言','語言'],['简体','簡體'],['选择','選擇'],['显示','顯示'],['外观','外觀'],['主题','主題'],['跟随','跟隨'],['浅色','淺色'],['动画','動畫'],['确定','確定']];
 const tw=s=>{TP.forEach(p=>{s=s.split(p[0]).join(p[1])});return s.replace(/[一-鿿]/g,c=>TWM[c]||c)};
-const EN={'语言':'Language','🌐 语言 / Language':'🌐 Language','🎨 外观主题':'🎨 Appearance','✨ 页面动画':'✨ Animations','📷 自定义头像图片':'📷 Custom avatar image','选择图片':'Choose image','记账与项目':'Expenses & projects','💰 月度预算（元）':'💰 Monthly budget (¥)','📂 自定义项目':'📂 Custom projects','确定清空所有记录？此操作无法撤销。':'Delete all records? This cannot be undone.','🎨 头像、名称、主题与偏好设置':'🎨 Profile & preferences','数据只保存在本机，换设备不会自动同步。更新前建议先导出备份。':'Data stays on this device. Export a backup before updating.','设置':'Settings','个人资料':'Profile','头像':'Avatar','我的显示名称':'Profile name','应用标题':'App title','个性化':'Personalize','返回':'Back','管理':'Manage','项目管理':'Manage projects','自定义项目':'Custom projects','数据管理':'Data management','清空所有记录':'Clear all records','跟随系统':'System','浅色':'Light','深色':'Dark','立即更新':'Update now','有新版本可用':'Update available','请确认':'Confirm','确认':'Confirm','所有记录已清空':'All records cleared','项目已添加':'Project added','项目已存在':'Project already exists','头像已更新':'Avatar updated','报销记':'Expense Log','首页':'Home','记录':'Records','统计':'Stats','我的':'Me','本月已记账':'Spent this month','待提交':'Draft','审批中':'Pending','已报销':'Reimbursed','已驳回':'Rejected','记一笔':'Add Expense','上传票据':'Upload Receipts','批量提交':'Batch Submit','导出':'Export','本月支出构成':'This Month by Category','本月':'This month','本月还没有记录':'No records this month','最近记录':'Recent Records','查看全部 ›':'View all ›','报销记录':'Expense Records','多选':'Select','取消':'Cancel','🔍 搜索事由、分类、项目':'🔍 Search description, category, project','全部':'All','仅“待提交”的记录可勾选':'Only “Draft” records can be selected','提交报销单':'Submit Claim','没有符合条件的记录':'No matching records','点下方 ＋ 记一笔':'Tap the + button to add one','数据统计':'Statistics','累计':'Total','笔数':'Records','单笔均值':'Avg per record','近 6 个月趋势':'Last 6 Months','分类排行':'By Category','报销进度':'Claim Progress','我的报销本':'My Expense Book','设置':'Settings','🌐 语言 / Language':'🌐 Language','💰 月度预算':'💰 Monthly budget','🔔 待提交提醒':'🔔 Draft reminders','📤 导出 CSV（复制到剪贴板）':'📤 Export CSV (copy to clipboard)','♻️ 恢复演示数据':'♻️ Restore demo data','🗑️ 清空所有记录':'🗑️ Clear all records','报销记 · 预览版 v0.1':'Expense Log · Preview v0.1','数据仅保存在本机浏览器':'Data is stored on this device only','切换提醒':'Toggle reminders','交通':'Transport','餐饮':'Meals','住宿':'Lodging','办公':'Office','通讯':'Phone','差旅':'Travel','招待':'Hosting','其他':'Other','日常':'General','客户拜访':'Client Visit','出差':'Business Trip','团建':'Team Building','采购':'Purchasing','会议':'Meetings','培训学习':'Training','展会活动':'Events','设备维修':'Equipment Repair','项目交付':'Project Delivery','市场推广':'Marketing','研发测试':'R&D / Testing','行政后勤':'Admin','招待宴请':'Hospitality','微信':'WeChat','支付宝':'Alipay','银行卡':'Bank Card','现金':'Cash','公司卡':'Company Card','编辑报销':'Edit Expense','金额（元）':'Amount (¥)','事由':'Description','例如：客户午餐':'e.g. Client lunch','分类':'Category','日期':'Date','所属项目':'Project','没有合适的？自定义项目名称':'Not listed? Add a custom project','添加':'Add','支付方式':'Payment','🖼️ 上传票据图片（可多选）':'🖼️ Upload receipt images (multiple)','或粘贴票据链接（电子发票、网盘等）':'Or paste a receipt link (e-invoice, cloud drive…)','备注':'Notes','选填':'Optional','保存':'Save','票据图片':'Receipt image','票据大图':'Receipt','票据':'Receipts','未附':'None','项目':'Project','已记录':'Logged','提交报销':'Submit','编辑':'Edit','标记已报销':'Mark Reimbursed','驳回':'Reject','撤回':'Withdraw','撤回到待提交':'Back to Draft','修改后重新提交':'Revise & Resubmit','删除':'Delete','金额':'Amount','发票':'Invoice','状态':'Status','有':'Yes','无':'No','预算已更新':'Budget updated','已复制 CSV，可粘贴到表格':'CSV copied — paste it into a spreadsheet','复制失败，请重试':'Copy failed, please retry','当前环境无法复制':'Copy is not available here','已恢复演示数据':'Demo data restored','请输入有效金额':'Enter a valid amount','已保存':'Saved','请先粘贴链接':'Paste a link first','链接格式不正确':'Invalid link','图片无法读取':'Could not read image','请输入项目名称':'Enter a project name','本机存储空间不足，附件可能无法长期保存':'Storage is full — attachments may not be kept','恢复演示数据？现有记录将被替换':'Restore demo data? Existing records will be replaced','清空所有记录？':'Clear all records?','删除这条记录？':'Delete this record?','费用':' expense','出租车到客户公司':'Taxi to client office','客户午餐工作餐':'Client business lunch','打印纸与签字笔':'Printer paper & pens','上海出差高铁票':'Shanghai trip – train ticket','上海酒店 2 晚':'Shanghai hotel (2 nights)','客户招待晚宴':'Client dinner','手机话费补贴':'Phone bill allowance','网约车加班回家':'Ride home after overtime','团建烧烤':'Team BBQ','采购线材接头':'Cable connectors','北京出差机票':'Beijing trip – flight','展会物料':'Trade show materials','客户拜访打车':'Taxi for client visits','季度办公用品':'Quarterly office supplies'};
+const EN={'软件更新':'Software updates','🔄 检查更新':'🔄 Check for updates','当前版本':'Current version','最新版本':'Available version','正在检查更新…':'Checking for updates…','已经是最新版本':'You are up to date','发现新版本':'Update available','检查失败':'Unable to check for updates','无法取得版本信息':'Could not retrieve version information','请检查网络后重试':'Check your connection and try again','发现新版，点击立即更新':'A new version is ready. Tap Update now.','当前已安装最新版本':'The latest version is installed.','稍后':'Later','关闭':'Close','重试':'Retry','更新中…':'Updating…','功能与管理':'Tools & management','设置与个性化':'Settings & personalization','语言':'Language','🌐 语言 / Language':'🌐 Language','🎨 外观主题':'🎨 Appearance','✨ 页面动画':'✨ Animations','📷 自定义头像图片':'📷 Custom avatar image','选择图片':'Choose image','记账与项目':'Expenses & projects','💰 月度预算（元）':'💰 Monthly budget (¥)','📂 自定义项目':'📂 Custom projects','确定清空所有记录？此操作无法撤销。':'Delete all records? This cannot be undone.','🎨 头像、名称、主题与偏好设置':'🎨 Profile & preferences','数据只保存在本机，换设备不会自动同步。更新前建议先导出备份。':'Data stays on this device. Export a backup before updating.','设置':'Settings','个人资料':'Profile','头像':'Avatar','我的显示名称':'Profile name','应用标题':'App title','个性化':'Personalize','返回':'Back','管理':'Manage','项目管理':'Manage projects','自定义项目':'Custom projects','数据管理':'Data management','清空所有记录':'Clear all records','跟随系统':'System','浅色':'Light','深色':'Dark','立即更新':'Update now','有新版本可用':'Update available','请确认':'Confirm','确认':'Confirm','所有记录已清空':'All records cleared','项目已添加':'Project added','项目已存在':'Project already exists','头像已更新':'Avatar updated','报销记':'Expense Log','首页':'Home','记录':'Records','统计':'Stats','我的':'Me','本月已记账':'Spent this month','待提交':'Draft','审批中':'Pending','已报销':'Reimbursed','已驳回':'Rejected','记一笔':'Add Expense','上传票据':'Upload Receipts','批量提交':'Batch Submit','导出':'Export','本月支出构成':'This Month by Category','本月':'This month','本月还没有记录':'No records this month','最近记录':'Recent Records','查看全部 ›':'View all ›','报销记录':'Expense Records','多选':'Select','取消':'Cancel','🔍 搜索事由、分类、项目':'🔍 Search description, category, project','全部':'All','仅“待提交”的记录可勾选':'Only “Draft” records can be selected','提交报销单':'Submit Claim','没有符合条件的记录':'No matching records','点下方 ＋ 记一笔':'Tap the + button to add one','数据统计':'Statistics','累计':'Total','笔数':'Records','单笔均值':'Avg per record','近 6 个月趋势':'Last 6 Months','分类排行':'By Category','报销进度':'Claim Progress','我的报销本':'My Expense Book','设置':'Settings','🌐 语言 / Language':'🌐 Language','💰 月度预算':'💰 Monthly budget','🔔 待提交提醒':'🔔 Draft reminders','📤 导出 CSV（复制到剪贴板）':'📤 Export CSV (copy to clipboard)','♻️ 恢复演示数据':'♻️ Restore demo data','🗑️ 清空所有记录':'🗑️ Clear all records','报销记 · 预览版 v0.1':'Expense Log · Preview v0.1','数据仅保存在本机浏览器':'Data is stored on this device only','切换提醒':'Toggle reminders','交通':'Transport','餐饮':'Meals','住宿':'Lodging','办公':'Office','通讯':'Phone','差旅':'Travel','招待':'Hosting','其他':'Other','日常':'General','客户拜访':'Client Visit','出差':'Business Trip','团建':'Team Building','采购':'Purchasing','会议':'Meetings','培训学习':'Training','展会活动':'Events','设备维修':'Equipment Repair','项目交付':'Project Delivery','市场推广':'Marketing','研发测试':'R&D / Testing','行政后勤':'Admin','招待宴请':'Hospitality','微信':'WeChat','支付宝':'Alipay','银行卡':'Bank Card','现金':'Cash','公司卡':'Company Card','编辑报销':'Edit Expense','金额（元）':'Amount (¥)','事由':'Description','例如：客户午餐':'e.g. Client lunch','分类':'Category','日期':'Date','所属项目':'Project','没有合适的？自定义项目名称':'Not listed? Add a custom project','添加':'Add','支付方式':'Payment','🖼️ 上传票据图片（可多选）':'🖼️ Upload receipt images (multiple)','或粘贴票据链接（电子发票、网盘等）':'Or paste a receipt link (e-invoice, cloud drive…)','备注':'Notes','选填':'Optional','保存':'Save','票据图片':'Receipt image','票据大图':'Receipt','票据':'Receipts','未附':'None','项目':'Project','已记录':'Logged','提交报销':'Submit','编辑':'Edit','标记已报销':'Mark Reimbursed','驳回':'Reject','撤回':'Withdraw','撤回到待提交':'Back to Draft','修改后重新提交':'Revise & Resubmit','删除':'Delete','金额':'Amount','发票':'Invoice','状态':'Status','有':'Yes','无':'No','预算已更新':'Budget updated','已复制 CSV，可粘贴到表格':'CSV copied — paste it into a spreadsheet','复制失败，请重试':'Copy failed, please retry','当前环境无法复制':'Copy is not available here','已恢复演示数据':'Demo data restored','请输入有效金额':'Enter a valid amount','已保存':'Saved','请先粘贴链接':'Paste a link first','链接格式不正确':'Invalid link','图片无法读取':'Could not read image','请输入项目名称':'Enter a project name','本机存储空间不足，附件可能无法长期保存':'Storage is full — attachments may not be kept','恢复演示数据？现有记录将被替换':'Restore demo data? Existing records will be replaced','清空所有记录？':'Clear all records?','删除这条记录？':'Delete this record?','费用':' expense','出租车到客户公司':'Taxi to client office','客户午餐工作餐':'Client business lunch','打印纸与签字笔':'Printer paper & pens','上海出差高铁票':'Shanghai trip – train ticket','上海酒店 2 晚':'Shanghai hotel (2 nights)','客户招待晚宴':'Client dinner','手机话费补贴':'Phone bill allowance','网约车加班回家':'Ride home after overtime','团建烧烤':'Team BBQ','采购线材接头':'Cable connectors','北京出差机票':'Beijing trip – flight','展会物料':'Trade show materials','客户拜访打车':'Taxi for client visits','季度办公用品':'Quarterly office supplies'};
 const EP=[[/^([0-9]+)月 · 让每一笔都不被遗忘$/,m=>MO[m-1]+' · Every receipt counts'],[/^([0-9]+)月$/,m=>MO[m-1]],[/^预算 (.+)$/,x=>'Budget '+x],[/^已超支 (.+)$/,x=>'Over by '+x],[/^剩余 (.+)$/,x=>'Left '+x],[/^共? ?([0-9]+) 笔$/,n=>n+(n==1?' record':' records')],[/^合计 (.+)$/,x=>'Total '+x],[/^已选 ([0-9]+) 笔 · (.+)$/,(n,x)=>'Selected '+n+' · '+x],[/^已记 ([0-9]+) 笔 · 已报销 (.+)$/,(n,x)=>n+' records · Reimbursed '+x],[/^共 ([0-9]+) 个，可自定义$/,n=>n+' options · customizable'],[/^([0-9]+) 个附件$/,n=>n+(n==1?' attachment':' attachments')],[/^状态已更新：(.+)$/,s=>'Status updated: '+en(s)],[/^已提交 ([0-9]+) 笔，报销单 (BX[0-9]+)$/,(n,b)=>'Submitted '+n+' · Claim '+b]];
 function en(s){if(EN[s]!==undefined)return EN[s];for(const [re,f] of EP){const m=s.match(re);if(m)return f(...m.slice(1))}if(s.includes(' · '))return s.split(' · ').map(en).join(' · ');return s}
 const T=s=>L=='zh-CN'?s:L=='zh-TW'?tw(s):en(s);
@@ -204,12 +247,12 @@ function fix(n){if(n.nodeType==3){const v=n.nodeValue;if(!CJK.test(v))return;con
  n.childNodes.forEach(fix)}
 new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(fix))).observe(document.getElementById('app'),{childList:true,subtree:true});
 const LANGATTR={'zh-TW':'zh-Hant','zh-CN':'zh-Hans',en:'en'};
-function setLang(l){if(!LANGATTR[l])return;L=l;save();document.documentElement.lang=LANGATTR[l];document.title=T(S.appTitle||'报销记');$('#nav').innerHTML='';render();$('#updateBar span').textContent='✨ '+T('有新版本可用');$('#updateBar button').textContent=T('立即更新');anim()}
+function setLang(l){if(!LANGATTR[l])return;L=l;save();document.documentElement.lang=LANGATTR[l];document.title=T(S.appTitle||'报销记');$('#nav').innerHTML='';render();if($('#updateDialogMask').classList.contains('on'))drawUpdateDialog();anim()}
 document.documentElement.lang=LANGATTR[L];document.title=T(S.appTitle||'报销记');fix(document.getElementById('app'));applyTheme();
 const $=s=>document.querySelector(s);
 function toast(t){const e=$('#toast');e.textContent=T(t);e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2200)}
 function go(t,f){S.tab=t;if(f)S.filter=f;S.multi=false;S.pick=[];render();anim();$('#main').scrollTop=0}
-function anim(){if(S.animations===false)return;const m=$('#main');m.classList.remove('enter');void m.offsetWidth;m.classList.add('enter');clearTimeout(anim.t);anim.t=setTimeout(()=>m.classList.remove('enter'),1400);
+function anim(){document.documentElement.classList.toggle('motion-off',S.animations===false);if(S.animations===false){$('#main').classList.remove('enter');return;}const m=$('#main');m.classList.remove('enter');void m.offsetWidth;m.classList.add('enter');clearTimeout(anim.t);anim.t=setTimeout(()=>m.classList.remove('enter'),1400);
  document.querySelectorAll('[data-n]').forEach(e=>{const v=+e.dataset.n,t0=performance.now(),f=t=>{const p=Math.min(1,(t-t0)/800);e.textContent=money(v*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)})}
 const ym=(d=new Date())=>d.getFullYear()+'-'+pad(d.getMonth()+1);
 function item(r){const c=CATS[r.cat],s=ST[r.st],on=S.pick.includes(r.id);
@@ -222,7 +265,6 @@ function home(){const m=ym(),mr=S.recs.filter(r=>r.date.startsWith(m)),tot=sum(m
  return `<div class="top"><div><b>${esc(S.appTitle||'报销记')}</b><small>${new Date().getMonth()+1}月 · 让每一笔都不被遗忘</small></div></div>
  <div class="hero"><small>本月已记账</small><div class="big" data-n="${tot}">${money(tot)}</div><div class="bar"><i style="width:${pct}%"></i></div><div class="meta"><span>预算 ${money(S.budget)}</span><span>${tot>S.budget?'已超支 '+money(tot-S.budget):'剩余 '+money(S.budget-tot)}</span></div></div>
  <div class="stats"><div class="stat" style="border-color:var(--b)" onclick="go('list','draft')"><small>待提交</small><b data-n="${by('draft')}">${money(by('draft'))}</b></div><div class="stat" style="border-color:var(--y)" onclick="go('list','sub')"><small>审批中</small><b data-n="${by('sub')}">${money(by('sub'))}</b></div><div class="stat" style="border-color:var(--t)" onclick="go('list','paid')"><small>已报销</small><b data-n="${by('paid')}">${money(by('paid'))}</b></div></div>
- <div class="qa"><button onclick="openAdd()"><i style="background:#EEEAFF">✍️</i>记一笔</button><button onclick="openAdd(0,1)"><i style="background:#FFE9E2">📎</i>上传票据</button><button onclick="go('list','draft');S.multi=true;render()"><i style="background:#DDF8F2">📦</i>批量提交</button><button onclick="exportCSV()"><i style="background:#FFF3DB">📤</i>导出</button></div>
  <h2>本月支出构成</h2><div class="card donut"><div class="ring" style="background:conic-gradient(${grad})"><div><span><b>${mr.length} 笔</b>本月</span></div></div><div class="lg">${cs.length?cs.slice(0,5).map(([c,v])=>`<span><em style="background:${c[2]}"></em>${c[0]}<s>${money(v)}</s></span>`).join(''):'<span>本月还没有记录</span>'}</div></div>
  <h2>最近记录<a onclick="go('list','all')">查看全部 ›</a></h2>${[...S.recs].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,5).map(item).join('')}`}
 function list(){const q=S.q.trim();let a=S.recs.filter(r=>(S.filter=='all'||r.st==S.filter)&&(!q||(r.title+r.note+CATS[r.cat][0]+r.prj).includes(q)));
@@ -248,12 +290,14 @@ function stats(){const now=new Date(),ms=[];for(let i=5;i>=0;i--){const d=new Da
  <div class="card"><b>近 6 个月趋势</b><div class="cols">${vs.map((v,i)=>`<div class="col ${i==5?'cur':''}"><span>${v?Math.round(v):''}</span><i style="height:${Math.max(4,v/mx*100)}px"></i>${ms[i][0]}</div>`).join('')}</div></div>
  <h2>分类排行</h2><div class="card">${cs.map(([c,v])=>`<div class="rk"><div class="row"><span>${c[1]} ${c[0]}</span><span>${money(v)} · ${Math.round(v/all*100)}%</span></div><div class="bar"><i style="width:${v/cs[0][1]*100}%;background:${c[2]}"></i></div></div>`).join('')}</div>
  <h2>报销进度</h2><div class="card"><div class="stk">${ks.map((k,i)=>`<i style="width:${sv[i]/all*100}%;background:${ST[k][1]}"></i>`).join('')}</div>${ks.map((k,i)=>`<div class="kv"><span style="color:${ST[k][1]}">● ${ST[k][0]}</span><span>${money(sv[i])}</span></div>`).join('')}</div>`}
-function me(){const all=S.recs;return `<div class="top"><b>我的</b><button class="btn s" style="padding:8px 12px" onclick="go('settings')">⚙️ 设置</button></div>
+function me(){const all=S.recs;return `<div class="top"><b>我的</b></div>
   <div class="hero" style="display:flex;gap:14px;align-items:center"><div class="av profileAvatar">${avatarHtml()}</div><div><b style="font-size:18px">${esc(S.profileName||'我的报销本')}</b><div style="opacity:.9;font-size:12px;margin-top:4px">已记 ${all.length} 笔 · 已报销 ${money(sum(all.filter(r=>r.st=='paid')))}</div></div></div>
-  <h2>个人资料</h2><div class="menu">
-  <div onclick="go('settings')"><span>🎨 头像、名称、主题与偏好设置</span>›</div>
-  <div onclick="exportCSV()"><span>📤 导出 CSV（复制到剪贴板）</span>›</div></div>
-  <p class="footnote">${esc(S.appTitle||'报销记')} · v${VERSION} · 数据仅保存在本机浏览器</p>`}
+  <h2>功能与管理</h2><div class="menu">
+  <div onclick="go('settings')"><span>⚙️ 设置与个性化</span><b class="menuArrow">›</b></div>
+  <div class="settingField"><span>💰 月度预算（元）</span><input class="fi" style="width:120px;text-align:right" type="number" inputmode="decimal" min="0" value="${S.budget}" onchange="S.budget=Math.max(0,+this.value||0);save();toast('预算已更新')"></div>
+  <div><span>🔔 待提交提醒</span><button class="sw ${S.remind?'on':''}" onclick="S.remind=!S.remind;save();render()" aria-label="切换提醒"></button></div>
+  <div onclick="manageProjects()"><span>📂 自定义项目 (${(S.prjs||[]).length})</span><b class="menuArrow">›</b></div>
+  <div onclick="exportCSV()"><span>📤 导出 CSV（复制到剪贴板）</span><b class="menuArrow">›</b></div></div>`}
 function avatarHtml(){const a=S.avatar||'😊';return a.startsWith('data:image/')?`<img src="${a}" alt="头像" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`:esc(a)}
 function settings(){return `<div class="top"><button class="btn s" style="padding:8px 12px" onclick="go('me')">‹ 返回</button><b>设置</b></div>
   <h2>个性化</h2><div class="menu">
@@ -262,13 +306,11 @@ function settings(){return `<div class="top"><button class="btn s" style="paddin
   <div><span>头像</span><span class="av profileAvatar" style="flex:none;width:46px;height:46px">${avatarHtml()}</span></div>
   <div class="avatarChoices">${['😊','😀','😎','👩','👨','🐱','🐻','🌻','💼','🧾'].map(a=>`<button class="avatarChoice" onclick="setAvatar('${a}')">${a}</button>`).join('')}</div>
   <div><span>📷 自定义头像图片</span><button class="btn s" onclick="$('#avatarFile').click()">选择图片</button><input id="avatarFile" type="file" accept="image/*" hidden onchange="setAvatarFile(this.files[0])"></div>
-  <div class="settingField"><span>🌐 语言 / Language</span><div class="seg" translate="no" role="group" aria-label="Language">${[['zh-CN','简体'],['zh-TW','繁體'],['en','English']].map(([code,label])=>`<button type="button" class="${L===code?'on':''}" aria-pressed="${L===code}" onclick="setLang('${code}')">${label}</button>`).join('')}</div></div>
+  <div><span>🌐 语言 / Language</span><select class="fi" style="width:auto;max-width:55%" aria-label="Language" onchange="setLang(this.value)"><option value="zh-CN" ${L==='zh-CN'?'selected':''}>简体中文</option><option value="zh-TW" ${L==='zh-TW'?'selected':''}>繁體中文</option><option value="en" ${L==='en'?'selected':''}>English</option></select></div>
   <div><span>🎨 外观主题</span><select class="fi" style="width:auto" onchange="S.theme=this.value;applyTheme();save()"><option value="system" ${S.theme=='system'?'selected':''}>跟随系统</option><option value="light" ${S.theme=='light'?'selected':''}>浅色</option><option value="dark" ${S.theme=='dark'?'selected':''}>深色</option></select></div>
-  <div><span>✨ 页面动画</span><button class="sw ${S.animations!==false?'on':''}" onclick="S.animations=!(S.animations!==false);save();render()" aria-label="切换动画"></button></div></div>
-  <h2>记账与项目</h2><div class="menu">
-  <div><span>💰 月度预算（元）</span><input class="fi" style="width:120px;text-align:right" type="number" inputmode="decimal" min="0" value="${S.budget}" onchange="S.budget=Math.max(0,+this.value||0);save();toast('预算已更新')"></div>
-  <div><span>🔔 待提交提醒</span><button class="sw ${S.remind?'on':''}" onclick="S.remind=!S.remind;save();render()" aria-label="切换提醒"></button></div>
-  <div><span>📂 自定义项目 (${(S.prjs||[]).length})</span><button class="btn s" style="padding:8px" onclick="manageProjects()">管理</button></div></div>
+  <div><span>✨ 页面动画</span><button class="sw ${S.animations!==false?'on':''}" onclick="S.animations=!(S.animations!==false);document.documentElement.classList.toggle('motion-off',S.animations===false);save();render()" aria-label="切换动画"></button></div></div>
+  <h2>软件更新</h2><div class="menu">
+  <div onclick="checkUpdate(true)"><span>🔄 检查更新</span><span style="flex:none;color:var(--sub)">v${VERSION}</span><b class="menuArrow">›</b></div></div>
   <h2>数据管理</h2><div class="menu">
   <div onclick="exportCSV()"><span>📤 导出 CSV（复制到剪贴板）</span>›</div>
   <div onclick="askConfirm('确定清空所有记录？此操作无法撤销。',()=>{S.recs=[];save();render();toast('所有记录已清空')})"><span style="color:#E5484D">🗑️ 清空所有记录</span>›</div></div>
@@ -323,50 +365,87 @@ function openDetail(id){const r=S.recs.find(x=>x.id==id),c=CATS[r.cat],s=ST[r.st
 function render(){$('#main').innerHTML={home,list,stats,me,settings}[S.tab]();
  const n=[['home','🏠','首页'],['list','🧾','记录'],['add','＋',''],['stats','📊','统计'],['me','👤','我的']];
  if(!$('#nav').children.length)$('#nav').innerHTML=n.map(x=>x[0]=='add'?`<button class="fab" onclick="openAdd()" aria-label="记一笔"><span class="pl"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>`:`<button class="${S.tab==x[0]?'on':''}" onclick="go('${x[0]}')" data-t="${x[0]}"><i>${x[1]}</i>${x[2]}</button>`).join('');document.querySelectorAll('#nav button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab))}
-const VERSION='1.1.8';
-let updateReady=false, updateBusy=false;
+const VERSION='1.2.0';
+let updateReady=false, updateBusy=false, updateDialogState='checking', updateAvailableVersion='';
 const installedVersionKey='bxj-installed-app-version';
 function versionParts(v){return String(v||'').split('.').map(x=>parseInt(x,10)||0)}
 function newerVersion(remote,local){const a=versionParts(remote),b=versionParts(local);for(let i=0;i<Math.max(a.length,b.length);i++){if((a[i]||0)!==(b[i]||0))return (a[i]||0)>(b[i]||0)}return false}
-function showUpdate(){if(updateBusy)return;updateReady=true;$('#updateBar').classList.add('on')}
-async function checkUpdate(){
- if(!/^https?:/.test(location.protocol)||updateBusy)return;
+function drawUpdateDialog(){
+ const titles={checking:'正在检查更新…',latest:'已经是最新版本',available:'发现新版本',error:'检查失败',updating:'更新中…'};
+ const details={checking:'正在检查更新…',latest:'当前已安装最新版本',available:'发现新版，点击立即更新',error:'请检查网络后重试',updating:'更新中…'};
+ $('#updateTitle').textContent=T(titles[updateDialogState]);
+ $('#updateDetail').textContent=T(details[updateDialogState]);
+ $('#localVersionLabel').textContent=T('当前版本');
+ $('#remoteVersionLabel').textContent=T('最新版本');
+ $('#localVersion').textContent='v'+VERSION;
+ $('#remoteVersion').textContent=updateAvailableVersion?'v'+updateAvailableVersion:'—';
+ const close=$('#updateCancel'),act=$('#updateAction');
+ close.textContent=T(updateDialogState==='available'?'稍后':'关闭');
+ close.disabled=updateDialogState==='updating';
+ act.style.display=(updateDialogState==='available'||updateDialogState==='error')?'':'none';
+ act.textContent=T(updateDialogState==='available'?'立即更新':'重试');
+ act.disabled=updateBusy;
+}
+function showUpdateDialog(state,remote=''){
+ updateDialogState=state;
+ if(remote)updateAvailableVersion=remote;
+ drawUpdateDialog();
+ $('#updateDialogMask').classList.add('on');
+}
+function closeUpdateDialog(){if(updateBusy)return;$('#updateDialogMask').classList.remove('on')}
+function updateDialogAction(){if(updateDialogState==='available')updateApp();else if(updateDialogState==='error')checkUpdate(true)}
+async function fetchRemoteVersion(){
+ const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
+ if(!r.ok)throw new Error('HTTP '+r.status);
+ const data=await r.json();
+ if(typeof data.version!=='string'||!/^\d+\.\d+\.\d+$/.test(data.version))throw new Error('Invalid version');
+ return data.version;
+}
+async function checkUpdate(manual=false){
+ if(updateBusy)return;
+ if(manual)showUpdateDialog('checking');
+ if(!/^https?:/.test(location.protocol)){
+  if(manual)showUpdateDialog('error');
+  return;
+ }
  try{
-  const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
-  if(!r.ok)return;
-  const remote=await r.json();
-  if(newerVersion(remote.version,VERSION)){showUpdate();return}
-  // A stale waiting worker alone is not proof that a newer app exists.
-  updateReady=false;$('#updateBar').classList.remove('on');
-  if('serviceWorker'in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg)reg.update().catch(()=>{})}
- }catch(e){}
+  const remote=await fetchRemoteVersion();
+  updateAvailableVersion=remote;
+  if(newerVersion(remote,VERSION)){
+   updateReady=true;
+   showUpdateDialog('available',remote);
+  }else{
+   updateReady=false;
+   if(manual)showUpdateDialog('latest',remote);
+   else if(updateDialogState==='available')closeUpdateDialog();
+  }
+ }catch(e){if(manual)showUpdateDialog('error')}
 }
 async function updateApp(){
  if(updateBusy)return;
  updateBusy=true;
- const btn=$('#updateBar button');if(btn){btn.disabled=true;btn.textContent='更新中…'}
+ showUpdateDialog('updating');
  try{
-  const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
-  if(!r.ok)throw new Error('无法读取版本信息');
-  const remote=await r.json();
-  if(!newerVersion(remote.version,VERSION)){
-   updateReady=false;$('#updateBar').classList.remove('on');toast('当前已是最新版本');return;
+  const remote=await fetchRemoteVersion();
+  if(!newerVersion(remote,VERSION)){
+   updateBusy=false;showUpdateDialog('latest',remote);return;
   }
-  // Request the newly published worker first. Its navigation strategy is network-first.
+  // Install the updated Service Worker, then clear only app-shell caches.
   if('serviceWorker'in navigator){
    const reg=await navigator.serviceWorker.getRegistration();
    if(reg)await reg.update();
   }
-  // Only remove app shell caches. Never touch localStorage, IndexedDB or saved expenses.
   if('caches'in window){
    const keys=await caches.keys();
    await Promise.all(keys.filter(k=>k.startsWith('bxj-')).map(k=>caches.delete(k)));
   }
-  const url=new URL('./index.html',location.href);
-  url.searchParams.set('refresh',String(Date.now()));
-  location.replace(url.href);
- }catch(e){toast('更新失败：'+(e?.message||'网络错误'))}
- finally{updateBusy=false;if(btn){btn.disabled=false;btn.textContent=T('立即更新')}}
+  const target=new URL('./index.html',location.href);
+  target.searchParams.set('refresh',String(Date.now()));
+  location.replace(target.href);
+ }catch(e){
+  updateBusy=false;
+  showUpdateDialog('error');
+ }
 }
 
 try{
