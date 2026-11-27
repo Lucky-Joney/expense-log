@@ -132,8 +132,6 @@ nav button.on::after{transform:scale(1)}
 #mask{background:transparent;}
 #mask .sheet{height:auto;max-height:92%;border-radius:24px 24px 0 0;background:var(--surface,#fff);color:var(--tx);box-shadow:0 -8px 32px rgba(31,35,64,.10);}
 #mask .sheet h3{position:static;background:transparent;padding:0;margin:0 0 12px;}
-html[data-theme="dark"] #mask{background:transparent;}
-html[data-theme="dark"] #mask .sheet{box-shadow:0 -8px 32px rgba(0,0,0,.24);}
 
 /* Keep native-size mobile layout while preserving vertical scrolling. */
 html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
@@ -147,8 +145,6 @@ body,#app,main,nav,button,.it,.menu,.card,.hero,.sheet{user-select:none;-webkit-
 input,textarea,select{user-select:text;-webkit-user-select:text;-webkit-touch-callout:default}
 .av.profileAvatar{width:56px;height:56px;font-size:29px;display:grid;place-items:center;overflow:hidden;flex:none}
 .footnote{color:var(--sub);font-size:12px;text-align:center;margin:20px 0 8px;line-height:1.7}
-.avatarChoices{display:flex!important;flex-wrap:wrap;gap:7px;justify-content:flex-start!important}
-.avatarChoice{background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:8px;font-size:23px}
 .settingField{gap:10px}
 #confirmMask{position:absolute;inset:0;z-index:30;background:rgba(8,10,25,.55);display:none;align-items:center;justify-content:center;padding:24px}
 #confirmMask.on{display:flex}
@@ -169,15 +165,6 @@ input,textarea,select{user-select:text;-webkit-user-select:text;-webkit-touch-ca
 #updateDialogMask button:disabled{opacity:.55}
 @media(prefers-reduced-motion:reduce){#updateDialogMask,#updateDialog{transition:none!important}}
 :root{--surface:#fff}
-html[data-theme="dark"]{--p:#9C8AFF;--c:#FF9377;--t:#1BD9B8;--y:#FFBC45;--pk:#FF7EAB;--b:#6EA4FF;--bg:#151725;--tx:#F3F3FA;--sub:#ADB0C6;--ln:#35384F;--surface:#222538;color-scheme:dark}
-html[data-theme="dark"] body{background:#0E101A}
-html[data-theme="dark"] .card,html[data-theme="dark"] .stat,html[data-theme="dark"] .qa button,html[data-theme="dark"] .it,html[data-theme="dark"] .chip:not(.on),html[data-theme="dark"] .menu,html[data-theme="dark"] nav,html[data-theme="dark"] .sheet,html[data-theme="dark"] .fi,html[data-theme="dark"] .search,html[data-theme="dark"] .ring div,html[data-theme="dark"] .seg .on{background:var(--surface);color:var(--tx)}
-html[data-theme="dark"] .cg button,html[data-theme="dark"] .avatarChoice,html[data-theme="dark"] .seg{background:#303348;color:var(--tx)}
-html[data-theme="dark"] .cg button.on{background:#454164}
-html[data-theme="dark"] .btn.s{background:#393357;color:#C4B8FF}
-html[data-theme="dark"] .btn.d{background:#512B38;color:#FF9BA3}
-html[data-theme="dark"] .chip.on{background:var(--p);color:#111}
-html[data-theme="dark"] .toast{background:#41445A}
 @media (max-width:350px){.settingField{flex-wrap:wrap}.settingField input{width:100%!important}}
 
 /* v1.2.0: smoother, consistent motion without large stagger gaps. */
@@ -203,8 +190,6 @@ html[data-theme="dark"] .toast{background:#41445A}
 .menu>div:active{background:var(--bg);transform:scale(.995)}
 .menuArrow{flex:none;color:var(--sub);font-size:20px;font-weight:400}
 @media(prefers-reduced-motion:reduce){#main.enter>*,#main.enter #ls .it,#main.enter .hero .bar i,#main.enter .rk .bar i,#main.enter .stk i,#main.enter .col i,#main.enter .ring{animation:none!important}.sheet,.mask,.toast,.menu>div{transition:none!important}}
-html.motion-off #main.enter>*,html.motion-off #main.enter #ls .it,html.motion-off #main.enter .hero .bar i,html.motion-off #main.enter .rk .bar i,html.motion-off #main.enter .stk i,html.motion-off #main.enter .col i,html.motion-off #main.enter .ring{animation:none!important}
-html.motion-off .mask,html.motion-off .sheet,html.motion-off .toast,html.motion-off .menu>div{transition:none!important}
 </style></head>
 <body><div id="app"><main id="main"></main>
 <nav id="nav"></nav>
@@ -227,8 +212,9 @@ const ago=n=>{const d=new Date();d.setDate(d.getDate()-n);return ymd(d)};
 const money=n=>'¥'+Number(n).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
 const sum=a=>a.reduce((s,r)=>s+r.amt,0),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const seed=()=>[[0,'出租车到客户公司',48.5,0,'draft','微信','客户拜访'],[1,'客户午餐工作餐',268,1,'draft','支付宝','客户拜访'],[3,'打印纸与签字笔',89.9,3,'sub','公司卡','日常'],[5,'上海出差高铁票',553,5,'sub','银行卡','出差'],[6,'上海酒店 2 晚',796,2,'sub','银行卡','出差'],[9,'客户招待晚宴',1288,6,'paid','公司卡','客户拜访'],[12,'手机话费补贴',99,4,'paid','微信','日常'],[16,'网约车加班回家',36.2,0,'rej','微信','日常'],[24,'团建烧烤',640,1,'paid','支付宝','团建'],[38,'采购线材接头',325,3,'paid','公司卡','采购'],[52,'北京出差机票',1180,5,'paid','银行卡','出差'],[70,'展会物料',860,7,'paid','银行卡','采购'],[96,'客户拜访打车',142,0,'paid','微信','客户拜访'],[130,'季度办公用品',512,3,'paid','公司卡','日常']].map((a,i)=>({id:i+1,date:ago(a[0]),title:a[1],amt:a[2],cat:a[3],st:a[4],pay:a[5],prj:a[6],inv:a[4]!='rej',note:''}));
-let S={recs:[],budget:5000,remind:true,prjs:[],appTitle:'报销记',profileName:'我的报销本',avatar:'😊',theme:'system',animations:true,tab:'home',filter:'all',q:'',multi:false,pick:[]};
+let S={recs:[],budget:5000,remind:true,prjs:[],appTitle:'报销记',profileName:'我的报销本',avatar:'😊',theme:'light',animations:true,tab:'home',filter:'all',q:'',multi:false,pick:[]};
 try{const j=JSON.parse(localStorage.getItem('bxj1')||'null');if(j&&j.recs)S=Object.assign(S,j,{tab:'home',multi:false,pick:[]})}catch(e){}
+S.theme='light';S.animations=true;
 let L=S.lang||(/^zh[-_](tw|hk|mo|hant)/i.test(navigator.language||'')?'zh-TW':/^zh/i.test(navigator.language||'')?'zh-CN':'en');
 const save=()=>{try{localStorage.setItem('bxj1',JSON.stringify({recs:S.recs,budget:S.budget,remind:S.remind,prjs:S.prjs,lang:L,appTitle:S.appTitle,profileName:S.profileName,avatar:S.avatar,theme:S.theme,animations:S.animations}))}catch(e){toast('本机存储空间不足，附件可能无法长期保存')}};
 /* ===== i18n：源文案为简体，繁体靠字表+词表，英文靠词典 ===== */
@@ -237,7 +223,7 @@ const PAIRS='与與个個义義习習仅僅传傳余餘储儲删刪办辦动動�
 const TWM={};for(let i=0;i<PAIRS.length;i+=2)TWM[PAIRS[i]]=PAIRS[i+1];
 const TP=[['复制','複製'],['导出','匯出'],['设置','設定'],['剪贴板','剪貼簿'],['网盘','雲端硬碟'],['出租车','計程車'],['网约车','叫車'],['打车','叫車'],['话费','電話費'],['打印纸','影印紙'],['项目','專案'],['添加','新增'],['保存','儲存'],['搜索','搜尋'],['链接','連結'],['软件','軟體'],['信息','資訊'],['视频','影片'],['文件','檔案'],['语言','語言'],['简体','簡體'],['选择','選擇'],['显示','顯示'],['外观','外觀'],['主题','主題'],['跟随','跟隨'],['浅色','淺色'],['动画','動畫'],['确定','確定']];
 const tw=s=>{TP.forEach(p=>{s=s.split(p[0]).join(p[1])});return s.replace(/[一-鿿]/g,c=>TWM[c]||c)};
-const EN={'软件更新':'Software updates','🔄 检查更新':'🔄 Check for updates','当前版本':'Current version','最新版本':'Available version','正在检查更新…':'Checking for updates…','已经是最新版本':'You are up to date','发现新版本':'Update available','检查失败':'Unable to check for updates','无法取得版本信息':'Could not retrieve version information','请检查网络后重试':'Check your connection and try again','发现新版，点击立即更新':'A new version is ready. Tap Update now.','当前已安装最新版本':'The latest version is installed.','稍后':'Later','关闭':'Close','重试':'Retry','更新中…':'Updating…','功能与管理':'Tools & management','设置与个性化':'Settings & personalization','语言':'Language','🌐 语言 / Language':'🌐 Language','🎨 外观主题':'🎨 Appearance','✨ 页面动画':'✨ Animations','📷 自定义头像图片':'📷 Custom avatar image','选择图片':'Choose image','记账与项目':'Expenses & projects','💰 月度预算（元）':'💰 Monthly budget (¥)','📂 自定义项目':'📂 Custom projects','确定清空所有记录？此操作无法撤销。':'Delete all records? This cannot be undone.','🎨 头像、名称、主题与偏好设置':'🎨 Profile & preferences','数据只保存在本机，换设备不会自动同步。更新前建议先导出备份。':'Data stays on this device. Export a backup before updating.','设置':'Settings','个人资料':'Profile','头像':'Avatar','我的显示名称':'Profile name','应用标题':'App title','个性化':'Personalize','返回':'Back','管理':'Manage','项目管理':'Manage projects','自定义项目':'Custom projects','数据管理':'Data management','清空所有记录':'Clear all records','跟随系统':'System','浅色':'Light','深色':'Dark','立即更新':'Update now','有新版本可用':'Update available','请确认':'Confirm','确认':'Confirm','所有记录已清空':'All records cleared','项目已添加':'Project added','项目已存在':'Project already exists','头像已更新':'Avatar updated','报销记':'Expense Log','首页':'Home','记录':'Records','统计':'Stats','我的':'Me','本月已记账':'Spent this month','待提交':'Draft','审批中':'Pending','已报销':'Reimbursed','已驳回':'Rejected','记一笔':'Add Expense','上传票据':'Upload Receipts','批量提交':'Batch Submit','导出':'Export','本月支出构成':'This Month by Category','本月':'This month','本月还没有记录':'No records this month','最近记录':'Recent Records','查看全部 ›':'View all ›','报销记录':'Expense Records','多选':'Select','取消':'Cancel','🔍 搜索事由、分类、项目':'🔍 Search description, category, project','全部':'All','仅“待提交”的记录可勾选':'Only “Draft” records can be selected','提交报销单':'Submit Claim','没有符合条件的记录':'No matching records','点下方 ＋ 记一笔':'Tap the + button to add one','数据统计':'Statistics','累计':'Total','笔数':'Records','单笔均值':'Avg per record','近 6 个月趋势':'Last 6 Months','分类排行':'By Category','报销进度':'Claim Progress','我的报销本':'My Expense Book','设置':'Settings','🌐 语言 / Language':'🌐 Language','💰 月度预算':'💰 Monthly budget','🔔 待提交提醒':'🔔 Draft reminders','📤 导出 CSV（复制到剪贴板）':'📤 Export CSV (copy to clipboard)','♻️ 恢复演示数据':'♻️ Restore demo data','🗑️ 清空所有记录':'🗑️ Clear all records','报销记 · 预览版 v0.1':'Expense Log · Preview v0.1','数据仅保存在本机浏览器':'Data is stored on this device only','切换提醒':'Toggle reminders','交通':'Transport','餐饮':'Meals','住宿':'Lodging','办公':'Office','通讯':'Phone','差旅':'Travel','招待':'Hosting','其他':'Other','日常':'General','客户拜访':'Client Visit','出差':'Business Trip','团建':'Team Building','采购':'Purchasing','会议':'Meetings','培训学习':'Training','展会活动':'Events','设备维修':'Equipment Repair','项目交付':'Project Delivery','市场推广':'Marketing','研发测试':'R&D / Testing','行政后勤':'Admin','招待宴请':'Hospitality','微信':'WeChat','支付宝':'Alipay','银行卡':'Bank Card','现金':'Cash','公司卡':'Company Card','编辑报销':'Edit Expense','金额（元）':'Amount (¥)','事由':'Description','例如：客户午餐':'e.g. Client lunch','分类':'Category','日期':'Date','所属项目':'Project','没有合适的？自定义项目名称':'Not listed? Add a custom project','添加':'Add','支付方式':'Payment','🖼️ 上传票据图片（可多选）':'🖼️ Upload receipt images (multiple)','或粘贴票据链接（电子发票、网盘等）':'Or paste a receipt link (e-invoice, cloud drive…)','备注':'Notes','选填':'Optional','保存':'Save','票据图片':'Receipt image','票据大图':'Receipt','票据':'Receipts','未附':'None','项目':'Project','已记录':'Logged','提交报销':'Submit','编辑':'Edit','标记已报销':'Mark Reimbursed','驳回':'Reject','撤回':'Withdraw','撤回到待提交':'Back to Draft','修改后重新提交':'Revise & Resubmit','删除':'Delete','金额':'Amount','发票':'Invoice','状态':'Status','有':'Yes','无':'No','预算已更新':'Budget updated','已复制 CSV，可粘贴到表格':'CSV copied — paste it into a spreadsheet','复制失败，请重试':'Copy failed, please retry','当前环境无法复制':'Copy is not available here','已恢复演示数据':'Demo data restored','请输入有效金额':'Enter a valid amount','已保存':'Saved','请先粘贴链接':'Paste a link first','链接格式不正确':'Invalid link','图片无法读取':'Could not read image','请输入项目名称':'Enter a project name','本机存储空间不足，附件可能无法长期保存':'Storage is full — attachments may not be kept','恢复演示数据？现有记录将被替换':'Restore demo data? Existing records will be replaced','清空所有记录？':'Clear all records?','删除这条记录？':'Delete this record?','费用':' expense','出租车到客户公司':'Taxi to client office','客户午餐工作餐':'Client business lunch','打印纸与签字笔':'Printer paper & pens','上海出差高铁票':'Shanghai trip – train ticket','上海酒店 2 晚':'Shanghai hotel (2 nights)','客户招待晚宴':'Client dinner','手机话费补贴':'Phone bill allowance','网约车加班回家':'Ride home after overtime','团建烧烤':'Team BBQ','采购线材接头':'Cable connectors','北京出差机票':'Beijing trip – flight','展会物料':'Trade show materials','客户拜访打车':'Taxi for client visits','季度办公用品':'Quarterly office supplies'};
+const EN={'软件更新':'Software updates','🔄 检查更新':'🔄 Check for updates','当前版本':'Current version','最新版本':'Available version','正在检查更新…':'Checking for updates…','已经是最新版本':'You are up to date','发现新版本':'Update available','检查失败':'Unable to check for updates','无法取得版本信息':'Could not retrieve version information','请检查网络后重试':'Check your connection and try again','发现新版，点击立即更新':'A new version is ready. Tap Update now.','当前已是最新版本':'The latest version is installed.','稍后':'Later','关闭':'Close','重试':'Retry','更新中…':'Updating…','功能与管理':'Tools & management','设置与个性化':'Settings & personalization','语言':'Language','🌐 语言 / Language':'🌐 Language','🎨 外观主题':'🎨 Appearance','✨ 页面动画':'✨ Animations','📷 自定义头像图片':'📷 Custom avatar image','选择图片':'Choose image','记账与项目':'Expenses & projects','💰 月度预算（元）':'💰 Monthly budget (¥)','📂 自定义项目':'📂 Custom projects','确定清空所有记录？此操作无法撤销。':'Delete all records? This cannot be undone.','🎨 头像、名称、主题与偏好设置':'🎨 Profile & preferences','数据只保存在本机，换设备不会自动同步。请注意：本机记账资料不会自动云端备份。':'Data stays on this device. Export a backup before updating.','设置':'Settings','个人资料':'Profile','头像':'Avatar','我的显示名称':'Profile name','应用标题':'App title','个性化':'Personalize','返回':'Back','管理':'Manage','项目管理':'Manage projects','自定义项目':'Custom projects','数据管理':'Data management','清空所有记录':'Clear all records','跟随系统':'System','浅色':'Light','深色':'Dark','立即更新':'Update now','有新版本可用':'Update available','请确认':'Confirm','确认':'Confirm','所有记录已清空':'All records cleared','项目已添加':'Project added','项目已存在':'Project already exists','头像已更新':'Avatar updated','报销记':'Expense Log','首页':'Home','记录':'Records','统计':'Stats','我的':'Me','本月已记账':'Spent this month','待提交':'Draft','审批中':'Pending','已报销':'Reimbursed','已驳回':'Rejected','记一笔':'Add Expense','上传票据':'Upload Receipts','批量提交':'Batch Submit','导出':'Export','本月支出构成':'This Month by Category','本月':'This month','本月还没有记录':'No records this month','最近记录':'Recent Records','查看全部 ›':'View all ›','报销记录':'Expense Records','多选':'Select','取消':'Cancel','🔍 搜索事由、分类、项目':'🔍 Search description, category, project','全部':'All','仅“待提交”的记录可勾选':'Only “Draft” records can be selected','提交报销单':'Submit Claim','没有符合条件的记录':'No matching records','点下方 ＋ 记一笔':'Tap the + button to add one','数据统计':'Statistics','累计':'Total','笔数':'Records','单笔均值':'Avg per record','近 6 个月趋势':'Last 6 Months','分类排行':'By Category','报销进度':'Claim Progress','我的报销本':'My Expense Book','设置':'Settings','🌐 语言 / Language':'🌐 Language','💰 月度预算':'💰 Monthly budget','🔔 待提交提醒':'🔔 Draft reminders','📤 导出 CSV（复制到剪贴板）':'📤 Export CSV (copy to clipboard)','♻️ 恢复演示数据':'♻️ Restore demo data','🗑️ 清空所有记录':'🗑️ Clear all records','报销记 · 预览版 v0.1':'Expense Log · Preview v0.1','数据仅保存在本机浏览器':'Data is stored on this device only','切换提醒':'Toggle reminders','交通':'Transport','餐饮':'Meals','住宿':'Lodging','办公':'Office','通讯':'Phone','差旅':'Travel','招待':'Hosting','其他':'Other','日常':'General','客户拜访':'Client Visit','出差':'Business Trip','团建':'Team Building','采购':'Purchasing','会议':'Meetings','培训学习':'Training','展会活动':'Events','设备维修':'Equipment Repair','项目交付':'Project Delivery','市场推广':'Marketing','研发测试':'R&D / Testing','行政后勤':'Admin','招待宴请':'Hospitality','微信':'WeChat','支付宝':'Alipay','银行卡':'Bank Card','现金':'Cash','公司卡':'Company Card','编辑报销':'Edit Expense','金额（元）':'Amount (¥)','事由':'Description','例如：客户午餐':'e.g. Client lunch','分类':'Category','日期':'Date','所属项目':'Project','没有合适的？自定义项目名称':'Not listed? Add a custom project','添加':'Add','支付方式':'Payment','🖼️ 上传票据图片（可多选）':'🖼️ Upload receipt images (multiple)','或粘贴票据链接（电子发票、网盘等）':'Or paste a receipt link (e-invoice, cloud drive…)','备注':'Notes','选填':'Optional','保存':'Save','票据图片':'Receipt image','票据大图':'Receipt','票据':'Receipts','未附':'None','项目':'Project','已记录':'Logged','提交报销':'Submit','编辑':'Edit','标记已报销':'Mark Reimbursed','驳回':'Reject','撤回':'Withdraw','撤回到待提交':'Back to Draft','修改后重新提交':'Revise & Resubmit','删除':'Delete','金额':'Amount','发票':'Invoice','状态':'Status','有':'Yes','无':'No','预算已更新':'Budget updated','已复制 CSV，可粘贴到表格':'CSV copied — paste it into a spreadsheet','复制失败，请重试':'Copy failed, please retry','当前环境无法复制':'Copy is not available here','已恢复演示数据':'Demo data restored','请输入有效金额':'Enter a valid amount','已保存':'Saved','请先粘贴链接':'Paste a link first','链接格式不正确':'Invalid link','图片无法读取':'Could not read image','请输入项目名称':'Enter a project name','本机存储空间不足，附件可能无法长期保存':'Storage is full — attachments may not be kept','恢复演示数据？现有记录将被替换':'Restore demo data? Existing records will be replaced','清空所有记录？':'Clear all records?','删除这条记录？':'Delete this record?','费用':' expense','出租车到客户公司':'Taxi to client office','客户午餐工作餐':'Client business lunch','打印纸与签字笔':'Printer paper & pens','上海出差高铁票':'Shanghai trip – train ticket','上海酒店 2 晚':'Shanghai hotel (2 nights)','客户招待晚宴':'Client dinner','手机话费补贴':'Phone bill allowance','网约车加班回家':'Ride home after overtime','团建烧烤':'Team BBQ','采购线材接头':'Cable connectors','北京出差机票':'Beijing trip – flight','展会物料':'Trade show materials','客户拜访打车':'Taxi for client visits','季度办公用品':'Quarterly office supplies'};
 const EP=[[/^([0-9]+)月 · 让每一笔都不被遗忘$/,m=>MO[m-1]+' · Every receipt counts'],[/^([0-9]+)月$/,m=>MO[m-1]],[/^预算 (.+)$/,x=>'Budget '+x],[/^已超支 (.+)$/,x=>'Over by '+x],[/^剩余 (.+)$/,x=>'Left '+x],[/^共? ?([0-9]+) 笔$/,n=>n+(n==1?' record':' records')],[/^合计 (.+)$/,x=>'Total '+x],[/^已选 ([0-9]+) 笔 · (.+)$/,(n,x)=>'Selected '+n+' · '+x],[/^已记 ([0-9]+) 笔 · 已报销 (.+)$/,(n,x)=>n+' records · Reimbursed '+x],[/^共 ([0-9]+) 个，可自定义$/,n=>n+' options · customizable'],[/^([0-9]+) 个附件$/,n=>n+(n==1?' attachment':' attachments')],[/^状态已更新：(.+)$/,s=>'Status updated: '+en(s)],[/^已提交 ([0-9]+) 笔，报销单 (BX[0-9]+)$/,(n,b)=>'Submitted '+n+' · Claim '+b]];
 function en(s){if(EN[s]!==undefined)return EN[s];for(const [re,f] of EP){const m=s.match(re);if(m)return f(...m.slice(1))}if(s.includes(' · '))return s.split(' · ').map(en).join(' · ');return s}
 const T=s=>L=='zh-CN'?s:L=='zh-TW'?tw(s):en(s);
@@ -270,7 +256,7 @@ function setFilter(f){
  render();
  $('#main').scrollTop=scroll;
 }
-function anim(){document.documentElement.classList.toggle('motion-off',S.animations===false);if(S.animations===false){$('#main').classList.remove('enter');return;}const m=$('#main');m.classList.remove('enter');void m.offsetWidth;m.classList.add('enter');clearTimeout(anim.t);anim.t=setTimeout(()=>m.classList.remove('enter'),1100);
+function anim(){document.documentElement.classList.remove('motion-off');const m=$('#main');m.classList.remove('enter');void m.offsetWidth;m.classList.add('enter');clearTimeout(anim.t);anim.t=setTimeout(()=>m.classList.remove('enter'),1100);
  document.querySelectorAll('[data-n]').forEach(e=>{const v=+e.dataset.n,t0=performance.now(),f=t=>{const p=Math.min(1,(t-t0)/800);e.textContent=money(v*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)})}
 const ym=(d=new Date())=>d.getFullYear()+'-'+pad(d.getMonth()+1);
 function item(r){const c=CATS[r.cat],s=ST[r.st],on=S.pick.includes(r.id);
@@ -315,25 +301,22 @@ function me(){const all=S.recs;return `<div class="top"><b>我的</b></div>
   <div class="settingField"><span>💰 月度预算（元）</span><input class="fi" style="width:120px;text-align:right" type="number" inputmode="decimal" min="0" value="${S.budget}" onchange="S.budget=Math.max(0,+this.value||0);save();toast('预算已更新')"></div>
   <div><span>🔔 待提交提醒</span><button class="sw ${S.remind?'on':''}" onclick="S.remind=!S.remind;save();render()" aria-label="切换提醒"></button></div>
   <div onclick="manageProjects()"><span>📂 自定义项目 (${(S.prjs||[]).length})</span><b class="menuArrow">›</b></div>
-  <div onclick="exportCSV()"><span>📤 导出 CSV（复制到剪贴板）</span><b class="menuArrow">›</b></div></div>`}
+  </div>`}
 function avatarHtml(){const a=S.avatar||'😊';return a.startsWith('data:image/')?`<img src="${a}" alt="头像" style="width:100%;height:100%;border-radius:50%;object-fit:cover">`:esc(a)}
 function settings(){return `<div class="top"><button class="btn s" style="padding:8px 12px" onclick="go('me')">‹ 返回</button><b>设置</b></div>
   <h2>个性化</h2><div class="menu">
   <div class="settingField"><span>应用标题</span><input class="fi" maxlength="24" style="width:52%" value="${esc(S.appTitle||'报销记')}" oninput="S.appTitle=this.value.slice(0,24);save();document.title=S.appTitle||'报销记'" onchange="render()"></div>
   <div class="settingField"><span>我的显示名称</span><input class="fi" maxlength="24" style="width:52%" value="${esc(S.profileName||'我的报销本')}" oninput="S.profileName=this.value.slice(0,24);save()"></div>
   <div><span>头像</span><span class="av profileAvatar" style="flex:none;width:46px;height:46px">${avatarHtml()}</span></div>
-  <div class="avatarChoices">${['😊','😀','😎','👩','👨','🐱','🐻','🌻','💼','🧾'].map(a=>`<button class="avatarChoice" onclick="setAvatar('${a}')">${a}</button>`).join('')}</div>
   <div><span>📷 自定义头像图片</span><button class="btn s" onclick="$('#avatarFile').click()">选择图片</button><input id="avatarFile" type="file" accept="image/*" hidden onchange="setAvatarFile(this.files[0])"></div>
   <div><span>🌐 语言 / Language</span><select class="fi" style="width:auto;max-width:55%" aria-label="Language" onchange="setLang(this.value)"><option value="zh-CN" ${L==='zh-CN'?'selected':''}>简体中文</option><option value="zh-TW" ${L==='zh-TW'?'selected':''}>繁體中文</option><option value="en" ${L==='en'?'selected':''}>English</option></select></div>
-  <div><span>🎨 外观主题</span><select class="fi" style="width:auto" onchange="S.theme=this.value;applyTheme();save()"><option value="system" ${S.theme=='system'?'selected':''}>跟随系统</option><option value="light" ${S.theme=='light'?'selected':''}>浅色</option><option value="dark" ${S.theme=='dark'?'selected':''}>深色</option></select></div>
-  <div><span>✨ 页面动画</span><button class="sw ${S.animations!==false?'on':''}" onclick="S.animations=!(S.animations!==false);document.documentElement.classList.toggle('motion-off',S.animations===false);save();render()" aria-label="切换动画"></button></div></div>
+  </div>
   <h2>软件更新</h2><div class="menu">
   <div onclick="checkUpdate(true)"><span>🔄 检查更新</span><span style="flex:none;color:var(--sub)">v${VERSION}</span><b class="menuArrow">›</b></div></div>
   <h2>数据管理</h2><div class="menu">
-  <div onclick="exportCSV()"><span>📤 导出 CSV（复制到剪贴板）</span>›</div>
   <div onclick="askConfirm('确定清空所有记录？此操作无法撤销。',()=>{S.recs=[];save();render();toast('所有记录已清空')})"><span style="color:#E5484D">🗑️ 清空所有记录</span>›</div></div>
-  <p class="footnote">v${VERSION} · 数据只保存在本机，换设备不会自动同步。更新前建议先导出备份。</p>`}
-function applyTheme(){const choice=S.theme||'system',dark=choice==='dark'||(choice==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=dark?'dark':'light';document.querySelector('meta[name="theme-color"]').content=dark?'#151725':'#F5F6FB'}
+  <p class="footnote">v${VERSION} · 数据只保存在本机，换设备不会自动同步。请注意：本机记账资料不会自动云端备份。</p>`}
+function applyTheme(){document.documentElement.dataset.theme='light';document.documentElement.style.colorScheme='light';document.querySelector('meta[name="theme-color"]').content='#F5F6FB'}
 function setAvatar(a){S.avatar=a;save();render();toast('头像已更新')}
 function setAvatarFile(f){if(!f)return;if(!f.type.startsWith('image/'))return toast('请选择图片');if(f.size>10*1024*1024)return toast('图片不能超过10MB');const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=160;const ctx=c.getContext('2d');const side=Math.min(img.width,img.height);ctx.drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,160,160);S.avatar=c.toDataURL('image/jpeg',.75);save();render();toast('头像已更新')};img.onerror=()=>toast('图片无法读取');img.src=fr.result};fr.readAsDataURL(f)}
 function manageProjects(){const ls=(S.prjs||[]).map((v,i)=>`<div class="kv"><span>${esc(v)}</span><button class="btn d" style="padding:6px 10px" onclick="removeProject(${i})">删除</button></div>`).join('');$('#sheet').innerHTML=`<h3>项目管理 <a onclick="closeSheet()">✕</a></h3><p style="color:var(--sub)">新增的项目下次记账仍可选择；删除项目不会删除历史账目。</p>${ls||'<div class="empty">还没有自定义项目</div>'}<div class="row"><input class="fi" id="projectName" maxlength="30" placeholder="输入项目名称"><button class="btn" onclick="createProject()">添加</button></div>`;$('#mask').classList.add('on')}
@@ -342,8 +325,6 @@ function removeProject(i){const v=S.prjs[i];askConfirm('删除项目「'+v+'」�
 function askConfirm(message,onYes){confirmAction=onYes;$('#confirmText').textContent=T(message);$('#confirmMask').classList.add('on')}
 let confirmAction=null;
 function closeConfirm(ok=false){$('#confirmMask').classList.remove('on');const action=confirmAction;confirmAction=null;if(ok&&action)action()}
-function exportCSV(){const t=['日期','事由','分类','金额','项目','支付方式','发票','状态'].map(T).join(',')+'\n'+S.recs.map(r=>[r.date,'"'+r.title+'"',T(CATS[r.cat][0]),r.amt,T(r.prj),T(r.pay),T((r.atts||[]).length?'有':'无'),T(ST[r.st][0])].join(',')).join('\n');
- try{navigator.clipboard.writeText(t).then(()=>toast('已复制 CSV，可粘贴到表格'),()=>toast('复制失败，请重试'))}catch(e){toast('当前环境无法复制')}}
 function clearData(){askConfirm('确定清空所有记录？',()=>{S.recs=[];save();render()})}
 let F={};
 function openAdd(id,cam){const r=id?S.recs.find(x=>x.id==id):null;F=r?{...r,atts:[...(r.atts||[])]}:{id:0,title:'',amt:'',cat:1,date:ago(0),pay:'微信',prj:'日常',inv:false,note:'',atts:[]};$('#sheet').scrollTop=0;sheetAdd(!!r);if(cam)setTimeout(()=>$('#up').scrollIntoView({block:'center'}),60)}
@@ -383,14 +364,14 @@ function openDetail(id){const r=S.recs.find(x=>x.id==id),c=CATS[r.cat],s=ST[r.st
 function render(){$('#main').innerHTML={home,list,stats,me,settings}[S.tab]();
  const n=[['home','🏠','首页'],['list','🧾','记录'],['add','＋',''],['stats','📊','统计'],['me','👤','我的']];
  if(!$('#nav').children.length)$('#nav').innerHTML=n.map(x=>x[0]=='add'?`<button class="fab" onclick="openAdd()" aria-label="记一笔"><span class="pl"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>`:`<button class="${S.tab==x[0]?'on':''}" onclick="go('${x[0]}')" data-t="${x[0]}"><i>${x[1]}</i>${x[2]}</button>`).join('');document.querySelectorAll('#nav button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab))}
-const VERSION='1.2.1';
+const VERSION='1.2.2';
 let updateReady=false, updateBusy=false, updateDialogState='checking', updateAvailableVersion='';
 const installedVersionKey='bxj-installed-app-version';
 function versionParts(v){return String(v||'').split('.').map(x=>parseInt(x,10)||0)}
 function newerVersion(remote,local){const a=versionParts(remote),b=versionParts(local);for(let i=0;i<Math.max(a.length,b.length);i++){if((a[i]||0)!==(b[i]||0))return (a[i]||0)>(b[i]||0)}return false}
 function drawUpdateDialog(){
  const titles={checking:'正在检查更新…',latest:'已经是最新版本',available:'发现新版本',error:'检查失败',updating:'更新中…'};
- const details={checking:'正在检查更新…',latest:'当前已安装最新版本',available:'发现新版，点击立即更新',error:'请检查网络后重试',updating:'更新中…'};
+ const details={checking:'正在检查更新…',latest:'当前已是最新版本',available:'发现新版，点击立即更新',error:'请检查网络后重试',updating:'更新中…'};
  $('#updateTitle').textContent=T(titles[updateDialogState]);
  $('#updateDetail').textContent=T(details[updateDialogState]);
  $('#localVersionLabel').textContent=T('当前版本');
@@ -405,13 +386,14 @@ function drawUpdateDialog(){
  act.disabled=updateBusy;
 }
 function showUpdateDialog(state,remote=''){
+ if(state!=='available'&&state!=='updating'){if(state==='error')toast(T('检查失败'));return;}
  updateDialogState=state;
  if(remote)updateAvailableVersion=remote;
  drawUpdateDialog();
  $('#updateDialogMask').classList.add('on');
 }
 function closeUpdateDialog(){if(updateBusy)return;$('#updateDialogMask').classList.remove('on')}
-function updateDialogAction(){if(updateDialogState==='available')updateApp();else if(updateDialogState==='error')checkUpdate(true)}
+function updateDialogAction(){if(updateDialogState==='available')updateApp()}
 async function fetchRemoteVersion(){
  const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});
  if(!r.ok)throw new Error('HTTP '+r.status);
@@ -423,7 +405,7 @@ async function checkUpdate(manual=false){
  if(updateBusy)return;
  if(manual)showUpdateDialog('checking');
  if(!/^https?:/.test(location.protocol)){
-  if(manual)showUpdateDialog('error');
+  if(manual)toast(T('检查失败'));
   return;
  }
  try{
@@ -434,10 +416,10 @@ async function checkUpdate(manual=false){
    showUpdateDialog('available',remote);
   }else{
    updateReady=false;
-   if(manual)showUpdateDialog('latest',remote);
+   if(manual)toast(T('已经是最新版本'));
    else if(updateDialogState==='available')closeUpdateDialog();
   }
- }catch(e){if(manual)showUpdateDialog('error')}
+ }catch(e){if(manual)toast(T('检查失败'))}
 }
 async function updateApp(){
  if(updateBusy)return;
@@ -446,7 +428,7 @@ async function updateApp(){
  try{
   const remote=await fetchRemoteVersion();
   if(!newerVersion(remote,VERSION)){
-   updateBusy=false;showUpdateDialog('latest',remote);return;
+   updateBusy=false;closeUpdateDialog();toast(T('已经是最新版本'));return;
   }
   // Install the updated Service Worker, then clear only app-shell caches.
   if('serviceWorker'in navigator){
@@ -462,7 +444,7 @@ async function updateApp(){
   location.replace(target.href);
  }catch(e){
   updateBusy=false;
-  showUpdateDialog('error');
+  closeUpdateDialog();toast(T('检查失败'));
  }
 }
 
@@ -478,8 +460,7 @@ if('serviceWorker'in navigator&&/^https?:/.test(location.protocol)){
   checkUpdate();
  }).catch(()=>checkUpdate()));
 }
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkUpdate()});
-window.addEventListener('focus',checkUpdate);
-if(window.matchMedia){matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(S.theme==='system')applyTheme()})}
+
+
 render();anim();
 </script></body></html>
