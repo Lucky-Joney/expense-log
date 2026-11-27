@@ -251,8 +251,26 @@ function setLang(l){if(!LANGATTR[l])return;L=l;save();document.documentElement.l
 document.documentElement.lang=LANGATTR[L];document.title=T(S.appTitle||'报销记');fix(document.getElementById('app'));applyTheme();
 const $=s=>document.querySelector(s);
 function toast(t){const e=$('#toast');e.textContent=T(t);e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2200)}
-function go(t,f){S.tab=t;if(f)S.filter=f;S.multi=false;S.pick=[];render();anim();$('#main').scrollTop=0}
-function anim(){document.documentElement.classList.toggle('motion-off',S.animations===false);if(S.animations===false){$('#main').classList.remove('enter');return;}const m=$('#main');m.classList.remove('enter');void m.offsetWidth;m.classList.add('enter');clearTimeout(anim.t);anim.t=setTimeout(()=>m.classList.remove('enter'),1400);
+function go(t,f){
+ const samePage=S.tab===t;
+ const filterChanged=!!f&&S.filter!==f;
+ // Tapping an already-selected navigation item is not a refresh action.
+ if(samePage&&!filterChanged)return;
+ S.tab=t;
+ if(f)S.filter=f;
+ S.multi=false;S.pick=[];
+ render();
+ if(!samePage){$('#main').scrollTop=0;anim();}
+}
+function setFilter(f){
+ // Selecting the active category should not rerender the list or replay animation.
+ if(S.filter===f)return;
+ S.filter=f;S.multi=false;S.pick=[];
+ const scroll=$('#main').scrollTop;
+ render();
+ $('#main').scrollTop=scroll;
+}
+function anim(){document.documentElement.classList.toggle('motion-off',S.animations===false);if(S.animations===false){$('#main').classList.remove('enter');return;}const m=$('#main');m.classList.remove('enter');void m.offsetWidth;m.classList.add('enter');clearTimeout(anim.t);anim.t=setTimeout(()=>m.classList.remove('enter'),1100);
  document.querySelectorAll('[data-n]').forEach(e=>{const v=+e.dataset.n,t0=performance.now(),f=t=>{const p=Math.min(1,(t-t0)/800);e.textContent=money(v*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)})}
 const ym=(d=new Date())=>d.getFullYear()+'-'+pad(d.getMonth()+1);
 function item(r){const c=CATS[r.cat],s=ST[r.st],on=S.pick.includes(r.id);
@@ -273,7 +291,7 @@ function list(){const q=S.q.trim();let a=S.recs.filter(r=>(S.filter=='all'||r.st
  const pb=S.multi&&S.pick.length?`<div class="pickbar"><span>已选 ${S.pick.length} 笔 · ${money(sum(S.recs.filter(r=>S.pick.includes(r.id))))}</span><button onclick="submitPick()">提交报销单</button></div>`:'';
  return `<div class="top"><b>报销记录</b><button class="btn s" style="padding:8px 14px" onclick="S.multi=!S.multi;S.pick=[];render()">${S.multi?'取消':'多选'}</button></div>
  <input class="search" id="q" placeholder="🔍 搜索事由、分类、项目" value="${esc(S.q)}" oninput="S.q=this.value;sl()">
- <div class="chips">${fs.map(f=>`<button class="chip ${S.filter==f[0]?'on':''}" onclick="S.filter='${f[0]}';render();anim()">${f[1]}</button>`).join('')}</div>
+ <div class="chips">${fs.map(f=>`<button class="chip ${S.filter==f[0]?'on':''}" onclick="setFilter('${f[0]}')">${f[1]}</button>`).join('')}</div>
  ${S.multi?'<small style="color:var(--sub)">仅“待提交”的记录可勾选</small>':''}
  <div id="ls" style="margin-top:8px">${lsHtml(a)}</div>${pb}`}
 function lsHtml(a){return a.length?`<div class="row" style="margin-bottom:8px;color:var(--sub);font-size:12px"><span>共 ${a.length} 笔</span><span>合计 ${money(sum(a))}</span></div>`+a.map(item).join(''):'<div class="empty">🗂️<br>没有符合条件的记录<br>点下方 ＋ 记一笔</div>'}
@@ -365,7 +383,7 @@ function openDetail(id){const r=S.recs.find(x=>x.id==id),c=CATS[r.cat],s=ST[r.st
 function render(){$('#main').innerHTML={home,list,stats,me,settings}[S.tab]();
  const n=[['home','🏠','首页'],['list','🧾','记录'],['add','＋',''],['stats','📊','统计'],['me','👤','我的']];
  if(!$('#nav').children.length)$('#nav').innerHTML=n.map(x=>x[0]=='add'?`<button class="fab" onclick="openAdd()" aria-label="记一笔"><span class="pl"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>`:`<button class="${S.tab==x[0]?'on':''}" onclick="go('${x[0]}')" data-t="${x[0]}"><i>${x[1]}</i>${x[2]}</button>`).join('');document.querySelectorAll('#nav button[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t==S.tab))}
-const VERSION='1.2.0';
+const VERSION='1.2.1';
 let updateReady=false, updateBusy=false, updateDialogState='checking', updateAvailableVersion='';
 const installedVersionKey='bxj-installed-app-version';
 function versionParts(v){return String(v||'').split('.').map(x=>parseInt(x,10)||0)}
